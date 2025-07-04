@@ -1,89 +1,89 @@
-# 📄 PDF Web Scraper
+# PDF Web Scraper
 
-Un potente strumento Python per trovare e scaricare file PDF da siti web in modo automatico e intelligente.
+A powerful Python tool for automatically finding and downloading PDF files from websites with intelligent crawling capabilities.
 
-## 🚀 Caratteristiche
+## Features
 
-- 🔍 **Crawling intelligente** - Esplora automaticamente tutte le pagine del sito
-- 🎯 **Filtro contenuti** - Analizza solo le aree di contenuto principale, evitando menu e footer
-- 📋 **Filtri personalizzabili** - Cerca PDF con parole chiave specifiche
-- ⏹️ **Controllo manuale** - Interrompi il crawling in qualsiasi momento premendo ENTER
-- 📁 **Download automatico** - Scarica tutti i PDF trovati in una cartella dedicata
-- 🛡️ **Rispettoso dei server** - Include delay configurabili tra le richieste
-- 🧭 **Tracciamento percorso** - Mostra da dove proviene ogni link visitato
-- 🏗️ **Architettura modulare** - Codice ben organizzato e facilmente estendibile
-- ⚡ **Gestione errori robusta** - Continua a funzionare anche con link non funzionanti
-- 🌐 **Rispetto del dominio** - Rimane sempre sullo stesso dominio di partenza
+- **Intelligent Crawling** - Automatically explores all pages of the website
+- **Content Filtering** - Analyzes only main content areas, avoiding menus and footers
+- **Customizable Filters** - Search for PDFs with specific keywords
+- **Manual Control** - Stop crawling at any time by pressing ENTER
+- **Automatic Download** - Downloads all found PDFs to a dedicated folder
+- **Server Respectful** - Includes configurable delays between requests
+- **Path Tracking** - Shows where each visited link comes from
+- **Modular Architecture** - Well-organized and easily extensible code
+- **Robust Error Handling** - Continues working even with broken links
+- **Domain Respect** - Always stays within the same starting domain
 
-## 📦 Installazione
+## Installation
 
-### Prerequisiti
+### Prerequisites
 - Python 3.7+
 - pip
 
-### Installa le dipendenze
+### Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-**Oppure manualmente:**
+**Or manually:**
 ```bash
 pip install requests beautifulsoup4 lxml urllib3
 ```
 
-### Installazione con ambiente virtuale (consigliato)
+### Installation with Virtual Environment (Recommended)
 ```bash
-# Crea ambiente virtuale
+# Create virtual environment
 python -m venv pdf_scraper_env
 
-# Attiva ambiente virtuale (Windows)
+# Activate virtual environment (Windows)
 pdf_scraper_env\Scripts\activate
 
-# Installa dipendenze
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-## 📂 Struttura del progetto
+## Project Structure
 
 ```
 Scraping/
-├── config.py           # Configurazioni globali
-├── crawler.py          # Motore di crawling del sito
-├── pdf_finder.py       # Ricerca e download dei PDF
-├── scrape.py           # Script principale
-├── requirements.txt    # Dipendenze del progetto
-├── README.md           # Questa documentazione
-└── downloaded_pdfs/    # Cartella dei PDF scaricati (creata automaticamente)
+├── config.py           # Global configurations
+├── crawler.py          # Website crawling engine
+├── pdf_finder.py       # PDF search and download
+├── scrape.py           # Main script
+├── requirements.txt    # Project dependencies
+├── README.md           # This documentation
+└── downloaded_pdfs/    # Downloaded PDFs folder (created automatically)
 ```
 
-## 🎯 Utilizzo
+## Usage
 
-### Utilizzo Interattivo
+### Interactive Usage
 ```bash
 python scrape.py
 ```
 
-Il programma ti chiederà:
-1. **URL del sito** da esplorare
-2. **Parole chiave** per filtrare i PDF (opzionale)
-3. **Conferma** prima di iniziare
+The program will ask you for:
+1. **Website URL** to explore
+2. **Keywords** to filter PDFs (optional)
+3. **Confirmation** before starting
 
-### Test rapido con siti sicuri
+### Quick Test with Safe Sites
 ```bash
-# Siti di test consigliati:
+# Recommended test sites:
 # - http://quotes.toscrape.com
 # - https://books.toscrape.com  
-# - https://www.python.org (con keywords: tutorial, guide, documentation)
-# - https://sabbio.etrasparenza.it (per testare PDF governativi)
+# - https://www.python.org (with keywords: tutorial, guide, documentation)
+# - https://sabbio.etrasparenza.it (for testing government PDFs)
 ```
 
-### ⏹️ Interruzione Manuale
-Durante il crawling, puoi interrompere il processo in qualsiasi momento:
-- **Premi ENTER** per fermare il crawling
-- Il sistema completerà la richiesta corrente e scaricherà i PDF trovati fino a quel momento
-- Non perdere nessun PDF già individuato!
+### Manual Interruption
+During crawling, you can interrupt the process at any time:
+- **Press ENTER** to stop crawling
+- The system will complete the current request and download PDFs found up to that point
+- You won't lose any PDFs already discovered!
 
-### Esempio di sessione
+### Example Session
 ```
 === PDF Web Scraper ===
 Enter the base URL to scrape for PDFs: https://www.example.com
@@ -106,7 +106,7 @@ Visiting: https://www.example.com/docs → (from https://www.example.com)
 Visiting: https://www.example.com/support → (from https://www.example.com)
 Found 5 PDF links.
 
-# Premendo ENTER durante il crawling:
+# Pressing ENTER during crawling:
 Stopping crawling... will finish current requests.
 Crawling completed. Found 5 links.
 Visited 3 URLs.
@@ -118,130 +118,130 @@ Downloading 5 PDF files...
 Downloaded 5 PDF files.
 ```
 
-### Utilizzo Programmatico
+### Programmatic Usage
 
 ```python
 from pdf_finder import PDFFinder
 
-# Cerca PDF con parole chiave
+# Search for PDFs with keywords
 finder = PDFFinder("https://www.example.com", keywords=["manual", "guide"])
 downloaded_files = finder.run()
 
-print(f"Scaricati {len(downloaded_files)} file PDF")
+print(f"Downloaded {len(downloaded_files)} PDF files")
 ```
 
-## ⚙️ Configurazione
+## Configuration
 
-Modifica il file `config.py` per personalizzare il comportamento:
+Edit the `config.py` file to customize behavior:
 
 ```python
-# Configurazioni per il PDF scraper
+# Configurations for PDF scraper
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-DELAY_BETWEEN_REQUESTS = 1  # secondi tra le richieste
-MAX_DEPTH = 2  # profondità massima di crawling (aumentata per crawling più efficace)
-DOWNLOAD_FOLDER = "downloaded_pdfs"  # cartella di download
+DELAY_BETWEEN_REQUESTS = 1  # seconds between requests
+MAX_DEPTH = 2  # maximum crawling depth (increased for more effective crawling)
+DOWNLOAD_FOLDER = "downloaded_pdfs"  # download folder
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB max per PDF
 ```
 
-## 🎯 Funzionalità Avanzate
+## Advanced Features
 
-### 🔍 Crawling Intelligente
-Il sistema utilizza un approccio intelligente per il crawling:
+### Intelligent Crawling
+The system uses an intelligent approach for crawling:
 
-- **Filtraggio delle aree di contenuto**: Cerca link solo nelle aree principali (`main`, `article`, `.content`, ecc.)
-- **Esclusione della navigazione**: Evita menu, header, footer e link di navigazione
-- **Tracciamento del percorso**: Mostra da dove proviene ogni URL visitato
-- **Fallback automatico**: Se non trova aree di contenuto, usa tutti i link escludendo la navigazione
+- **Content area filtering**: Searches for links only in main areas (`main`, `article`, `.content`, etc.)
+- **Navigation exclusion**: Avoids menus, headers, footers, and navigation links
+- **Path tracking**: Shows where each visited URL comes from
+- **Automatic fallback**: If no content areas are found, uses all links excluding navigation
 
-### ⏹️ Controllo Interattivo
-- **Interruzione manuale**: Premi ENTER in qualsiasi momento per fermare il crawling
-- **Thread separato**: Il monitoraggio dell'input non interferisce con il crawling
-- **Completamento sicuro**: Finisce le richieste in corso prima di fermarsi
-- **Download garantito**: Tutti i PDF trovati vengono scaricati anche dopo l'interruzione
+### Interactive Control
+- **Manual interruption**: Press ENTER at any time to stop crawling
+- **Separate thread**: Input monitoring doesn't interfere with crawling
+- **Safe completion**: Finishes current requests before stopping
+- **Guaranteed download**: All found PDFs are downloaded even after interruption
 
-## 🔧 Parametri Avanzati
+## Advanced Parameters
 
 ### WebCrawler
-- **base_url**: URL di partenza per il crawling
-- **max_depth**: Profondità massima di navigazione (default: 2)
-- **page_keywords**: Parole chiave per filtrare le pagine (attualmente disabilitato)
-- **stop_crawling**: Flag per interruzione manuale
+- **base_url**: Starting URL for crawling
+- **max_depth**: Maximum navigation depth (default: 2)
+- **page_keywords**: Keywords to filter pages (currently disabled)
+- **stop_crawling**: Flag for manual interruption
 
 ### PDFFinder
-- **base_url**: URL del sito da esplorare
-- **keywords**: Lista di parole chiave per filtrare i PDF
-- **download_folder**: Cartella di destinazione per i download
-- **pdf_keywords**: Filtri specifici per i PDF (separati dai filtri delle pagine)
+- **base_url**: Website URL to explore
+- **keywords**: List of keywords to filter PDFs
+- **download_folder**: Destination folder for downloads
+- **pdf_keywords**: Specific filters for PDFs (separate from page filters)
 
-## 🛡️ Considerazioni Etiche e Legali
+## Ethical and Legal Considerations
 
-⚠️ **IMPORTANTE**: Utilizza questo strumento in modo responsabile!
+**IMPORTANT**: Use this tool responsibly!
 
-### ✅ Buone Pratiche
-- Controlla sempre il file `robots.txt` del sito
-- Leggi i Terms of Service prima di fare scraping
-- Usa delay appropriati tra le richieste
-- Non sovraccaricare i server
-- Rispetta i diritti d'autore dei documenti
+### Best Practices
+- Always check the website's `robots.txt` file
+- Read Terms of Service before scraping
+- Use appropriate delays between requests
+- Don't overload servers
+- Respect document copyrights
 
-### 🎯 Siti Consigliati per Test
-- `http://quotes.toscrape.com` - Sito di test
-- `https://books.toscrape.com` - Libreria di test
-- Siti educativi e universitari pubblici
-- Il tuo sito web personale
+### Recommended Test Sites
+- `http://quotes.toscrape.com` - Test site
+- `https://books.toscrape.com` - Test bookstore
+- Public educational and university sites
+- Your personal website
 
-### ❌ Evita
-- Siti con dati sensibili o personali
-- Siti che esplicitamente vietano il crawling
-- Rate limiting aggressivo
-- Download di contenuti protetti da copyright
+### Avoid
+- Sites with sensitive or personal data
+- Sites that explicitly prohibit crawling
+- Aggressive rate limiting
+- Downloading copyright-protected content
 
-## 🐛 Risoluzione Problemi
+## Troubleshooting
 
-### Errori Comuni
+### Common Errors
 
 **"urlunparse() takes 1 positional argument but 6 were given"**
 ```python
-# ❌ Sbagliato
+# Wrong
 clean_url = urlunparse(scheme, netloc, path, params, query, fragment)
 
-# ✅ Corretto  
+# Correct  
 clean_url = urlunparse((scheme, netloc, path, params, query, fragment))
 ```
 
 **"No PDF files found"**
-- Controlla che il sito contenga effettivamente PDF
-- Prova senza parole chiave per vedere tutti i link
-- Verifica che l'URL sia corretto
-- Alcuni PDF potrebbero essere dietro form o login
-- Aumenta MAX_DEPTH se i PDF sono in pagine più profonde
+- Check that the site actually contains PDFs
+- Try without keywords to see all links
+- Verify that the URL is correct
+- Some PDFs might be behind forms or login
+- Increase MAX_DEPTH if PDFs are in deeper pages
 
-**Crawling che si ferma troppo presto**
-- Verifica che il sito non usi JavaScript per caricare i contenuti
-- Controlla se ci sono aree di contenuto riconosciute dal sistema
-- Guarda i messaggi "DEBUG - Found content area" nell'output
+**Crawling stops too early**
+- Check if the site uses JavaScript to load content
+- Verify if there are content areas recognized by the system
+- Look for "DEBUG - Found content area" messages in output
 
 **"DEBUG - No content area found, using all links"**
-- Il sito non usa tag semantici standard
-- Il sistema userà tutti i link escludendo la navigazione
-- Questo è normale per siti più vecchi o con struttura non standard
+- The site doesn't use standard semantic tags
+- The system will use all links excluding navigation
+- This is normal for older sites or non-standard structure
 
-**Timeout o errori di connessione**
-- Controlla la connessione internet
-- Aumenta il timeout in `config.py`
-- Alcuni siti potrebbero bloccare i bot
+**Timeout or connection errors**
+- Check internet connection
+- Increase timeout in `config.py`
+- Some sites might block bots
 
-## 📊 Output
+## Output
 
-I PDF scaricati vengono salvati nella cartella `downloaded_pdfs/` con:
-- **Nome originale** quando possibile
-- **Nome generato** per URL senza estensione chiara
-- **Controllo duplicati** - non scarica file già esistenti
-- **Log dettagliato** di tutte le operazioni
-- **Tracciamento percorso** - mostra da dove proviene ogni link visitato
-- **Debug delle aree di contenuto** - indica quali aree HTML sono state analizzate
+Downloaded PDFs are saved in the `downloaded_pdfs/` folder with:
+- **Original name** when possible
+- **Generated name** for URLs without clear extension
+- **Duplicate check** - doesn't download existing files
+- **Detailed logging** of all operations
+- **Path tracking** - shows where each visited link comes from
+- **Content area debugging** - indicates which HTML areas were analyzed
 
-### Esempio di Output Dettagliato
+### Detailed Output Example
 ```
 Starting crawl from: https://example.com
 Press Enter to stop crawling...
@@ -259,25 +259,24 @@ Found 3 PDF links.
 Downloading 3 PDF files...
 ```
 
-## 🔄 Estensioni Future
+## Future Extensions
 
-- [ ] Supporto per autenticazione (login)
-- [ ] Crawling multi-thread per velocità
-- [ ] Filtri per dimensione e tipo di file
-- [ ] Interfaccia grafica (GUI)
-- [ ] Supporto per proxy e VPN
-- [ ] Database dei file scaricati
-- [ ] Scheduling automatico
-- [ ] Supporto per altri formati (DOCX, XLSX, etc.)
-- [ ] Analisi del contenuto dei PDF scaricati
-- [ ] Supporto per JavaScript-rendered content
-- [ ] Configurazione avanzata delle aree di contenuto
-- [ ] Ripresa del crawling da dove si era interrotto
-- [ ] Statistiche dettagliate del crawling
+- [ ] Multi-threaded crawling for speed
+- [ ] Filters for file size and type
+- [ ] Graphical User Interface (GUI)
+- [ ] Support for proxy and VPN
+- [ ] Downloaded files database
+- [ ] Automatic scheduling
+- [ ] Support for other formats (DOCX, XLSX, etc.)
+- [ ] Downloaded PDF content analysis
+- [ ] Support for JavaScript-rendered content
+- [ ] Advanced content area configuration
+- [ ] Resume crawling from where it stopped
+- [ ] Detailed crawling statistics
 
-## 📝 File di Configurazione
+## Configuration Files
 
-Il progetto include un file `requirements.txt` aggiornato per semplificare l'installazione:
+The project includes an updated `requirements.txt` file to simplify installation:
 
 ```
 # Web scraping dependencies
@@ -293,43 +292,43 @@ certifi>=2023.7.22
 requests[security]>=2.31.0
 ```
 
-## 🔍 File del Progetto
+## Project Files
 
 ### `config.py`
-Contiene tutte le configurazioni globali del sistema.
+Contains all global system configurations.
 
 ### `crawler.py`  
-Implementa la classe `WebCrawler` per esplorare i siti web con:
-- Crawling intelligente delle aree di contenuto
-- Sistema di interruzione manuale tramite thread separato
-- Tracciamento del percorso per debug
-- Filtraggio automatico di menu e navigazione
+Implements the `WebCrawler` class for website exploration with:
+- Intelligent crawling of content areas
+- Manual interruption system via separate thread
+- Path tracking for debugging
+- Automatic filtering of menus and navigation
 
 ### `pdf_finder.py`
-Implementa la classe `PDFFinder` per cercare e scaricare PDF con:
-- Integrazione con WebCrawler per il filtraggio intelligente
-- Download con gestione errori robusta
-- Filtri per parole chiave nei nomi dei PDF
+Implements the `PDFFinder` class for searching and downloading PDFs with:
+- Integration with WebCrawler for intelligent filtering
+- Download with robust error handling
+- Keyword filters for PDF names
 
 ### `scrape.py`
-Script principale con interfaccia utente interattiva.
+Main script with interactive user interface.
 
-## 🤝 Contribuire
+## Contributing
 
-1. Fork del repository
-2. Crea un feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit delle modifiche (`git commit -m 'Add some AmazingFeature'`)
-4. Push al branch (`git push origin feature/AmazingFeature`)
-5. Apri una Pull Request
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📄 Licenza
+## License
 
-Questo progetto è rilasciato sotto licenza MIT. Vedi il file `LICENSE` per maggiori dettagli.
+This project is released under the MIT license. See the `LICENSE` file for more details.
 
-## ✨ Autore
+## Author
 
-Creato con ❤️ per semplificare la ricerca e il download di documenti PDF dal web.
+Created with care to simplify PDF document search and download from the web.
 
 ---
 
-⭐ Se questo progetto ti è stato utile, lascia una stella!
+If this project was useful to you, please give it a star!
