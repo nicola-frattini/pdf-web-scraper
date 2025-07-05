@@ -133,8 +133,17 @@ class WebCrawler:
 
     # Check if the URL matches the page keywords
     def matches_page_keywords(self, url):
-        
+        # If no page keywords are specified, accept all URLs
+        if not self.page_keywords:
             return True
+        
+        # Check if any keyword is found in the URL
+        url_lower = url.lower()
+        for keyword in self.page_keywords:
+            if keyword.lower() in url_lower:
+                return True
+        
+        return False
         
 
 

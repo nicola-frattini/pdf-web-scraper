@@ -6,6 +6,8 @@ A powerful Python tool for automatically finding and downloading PDF files from 
 
 - **Intelligent Crawling** - Automatically explores all pages of the website
 - **Content Filtering** - Analyzes only main content areas, avoiding menus and footers
+- **Dual Keyword System** - Separate filters for pages to visit and PDFs to download
+- **Smart File Naming** - Downloads PDFs with domain-prefixed names (e.g., `example_com_document.pdf`)
 - **Customizable Filters** - Search for PDFs with specific keywords
 - **Manual Control** - Stop crawling at any time by pressing ENTER
 - **Automatic Download** - Downloads all found PDFs to a dedicated folder
@@ -14,6 +16,21 @@ A powerful Python tool for automatically finding and downloading PDF files from 
 - **Modular Architecture** - Well-organized and easily extensible code
 - **Robust Error Handling** - Continues working even with broken links
 - **Domain Respect** - Always stays within the same starting domain
+
+Un potente strumento Python per trovare e scaricare file PDF da siti web in modo automatico e intelligente.
+
+## Caratteristiche
+
+- **Crawling intelligente** - Esplora automaticamente tutte le pagine del sito
+- **Filtro contenuti** - Analizza solo le aree di contenuto principale, evitando menu e footer
+- **Filtri personalizzabili** - Cerca PDF con parole chiave specifiche
+- **Controllo manuale** - Interrompi il crawling in qualsiasi momento premendo ENTER
+- **Download automatico** - Scarica tutti i PDF trovati in una cartella dedicata
+- **Rispettoso dei server** - Include delay configurabili tra le richieste
+- **Tracciamento percorso** - Mostra da dove proviene ogni link visitato
+- **Architettura modulare** - Codice ben organizzato e facilmente estendibile
+- **Gestione errori robusta** - Continua a funzionare anche con link non funzionanti
+- **Rispetto del dominio** - Rimane sempre sullo stesso dominio di partenza
 
 ## Installation
 
@@ -66,7 +83,8 @@ python scrape.py
 The program will ask you for:
 1. **Website URL** to explore
 2. **Keywords** to filter PDFs (optional)
-3. **Confirmation** before starting
+3. **Keywords** to filter pages to visit (optional)
+4. **Confirmation** before starting
 
 ### Quick Test with Safe Sites
 ```bash
@@ -88,10 +106,12 @@ During crawling, you can interrupt the process at any time:
 === PDF Web Scraper ===
 Enter the base URL to scrape for PDFs: https://www.example.com
 Enter keywords to filter PDFs (comma separated, leave empty for no filtering): manual, guide, tutorial
+Enter keywords to filter pages to visit (comma separated, leave empty for no filtering): docs, support, help
 
 Configuration:
 Base URL: https://www.example.com
 PDF Keywords: ['manual', 'guide', 'tutorial']
+Page Keywords: ['docs', 'support', 'help']
 Max Depth: 2
 Do you want to proceed? (y/n): y
 
@@ -112,8 +132,9 @@ Crawling completed. Found 5 links.
 Visited 3 URLs.
 
 Downloading 5 PDF files...
-[1/5] Downloaded user_manual.pdf to downloaded_pdfs
-[2/5] Downloaded installation_guide.pdf to downloaded_pdfs
+[1/5] Downloaded example_com_user_manual.pdf to downloaded_pdfs
+[2/5] Downloaded example_com_installation_guide.pdf to downloaded_pdfs
+[3/5] Downloaded example_com_document_1234.pdf to downloaded_pdfs
 ...
 Downloaded 5 PDF files.
 ```
@@ -123,8 +144,10 @@ Downloaded 5 PDF files.
 ```python
 from pdf_finder import PDFFinder
 
-# Search for PDFs with keywords
-finder = PDFFinder("https://www.example.com", keywords=["manual", "guide"])
+# Search for PDFs with both PDF and page keywords
+finder = PDFFinder("https://www.example.com", 
+                  pdf_keywords=["manual", "guide"], 
+                  page_keywords=["docs", "support"])
 downloaded_files = finder.run()
 
 print(f"Downloaded {len(downloaded_files)} PDF files")
@@ -159,19 +182,55 @@ The system uses an intelligent approach for crawling:
 - **Safe completion**: Finishes current requests before stopping
 - **Guaranteed download**: All found PDFs are downloaded even after interruption
 
+### Dual Keyword System
+The scraper supports two independent keyword filtering systems:
+
+- **Page Keywords**: Filter which pages to visit during crawling
+  - If specified, only visits pages whose URLs contain these keywords
+  - If empty, visits all pages within the domain
+  - Example: `["docs", "support", "help"]` will only visit pages containing these terms
+
+- **PDF Keywords**: Filter which PDFs to download
+  - If specified, only downloads PDFs whose URLs/filenames contain these keywords
+  - If empty, downloads all found PDFs
+  - Example: `["manual", "guide", "tutorial"]` will only download PDFs with these terms
+
+Both systems are completely optional and work independently.
+
+### Smart File Naming System
+The scraper now implements intelligent file naming that includes the source domain:
+
+- **Domain extraction**: Automatically extracts and cleans the domain from PDF URLs
+- **Character sanitization**: Removes invalid filename characters (`<>:"/\\|?*`) and replaces them with underscores
+- **www and protocol removal**: Cleans `www.`, `http://`, `https://` prefixes
+- **Port handling**: Removes port numbers from domain names
+- **Dot replacement**: Converts dots to underscores except for the final extension
+- **Fallback naming**: Uses hash-based IDs for URLs without clear filenames
+
+**Examples:**
+- `https://www.example.com:8080/docs/manual.pdf` → `example_com_manual.pdf`
+- `https://university.edu/research/paper.pdf` → `university_edu_paper.pdf`
+- `https://company.org/download?file=report` → `company_org_document_1234.pdf`
+
+This ensures that:
+- Files from different domains don't conflict
+- You can easily identify the source of each PDF
+- Filenames are valid across all operating systems
+- No duplicate downloads from the same source
+
 ## Advanced Parameters
 
 ### WebCrawler
 - **base_url**: Starting URL for crawling
 - **max_depth**: Maximum navigation depth (default: 2)
-- **page_keywords**: Keywords to filter pages (currently disabled)
+- **page_keywords**: Keywords to filter pages to visit (optional - if empty, visits all pages)
 - **stop_crawling**: Flag for manual interruption
 
 ### PDFFinder
 - **base_url**: Website URL to explore
-- **keywords**: List of keywords to filter PDFs
+- **pdf_keywords**: List of keywords to filter PDFs (optional)
+- **page_keywords**: List of keywords to filter pages to visit (optional)
 - **download_folder**: Destination folder for downloads
-- **pdf_keywords**: Specific filters for PDFs (separate from page filters)
 
 ## Ethical and Legal Considerations
 
@@ -234,12 +293,19 @@ clean_url = urlunparse((scheme, netloc, path, params, query, fragment))
 ## Output
 
 Downloaded PDFs are saved in the `downloaded_pdfs/` folder with:
-- **Original name** when possible
-- **Generated name** for URLs without clear extension
+- **Domain-prefixed names** - Files include the source domain (e.g., `example_com_manual.pdf`)
+- **Original name preservation** - When possible, keeps the original filename with domain prefix
+- **Generated names** - For URLs without clear filenames, creates `domain_document_ID.pdf`
+- **Safe filename handling** - Removes invalid characters and replaces them with underscores
 - **Duplicate check** - doesn't download existing files
 - **Detailed logging** of all operations
 - **Path tracking** - shows where each visited link comes from
 - **Content area debugging** - indicates which HTML areas were analyzed
+
+### File Naming Examples
+- `https://example.com/report.pdf` → `example_com_report.pdf`
+- `https://www.university.edu/docs/thesis-2024.pdf` → `university_edu_thesis-2024.pdf`
+- `https://company.org/download?id=123` → `company_org_document_1234.pdf`
 
 ### Detailed Output Example
 ```
@@ -261,6 +327,7 @@ Downloading 3 PDF files...
 
 ## Future Extensions
 
+- [ ] Support for authentication (login)
 - [ ] Multi-threaded crawling for speed
 - [ ] Filters for file size and type
 - [ ] Graphical User Interface (GUI)
@@ -307,8 +374,12 @@ Implements the `WebCrawler` class for website exploration with:
 ### `pdf_finder.py`
 Implements the `PDFFinder` class for searching and downloading PDFs with:
 - Integration with WebCrawler for intelligent filtering
-- Download with robust error handling
+- Smart domain-based file naming system
+- Download with robust error handling (DNS, timeout, HTTP, file system errors)
+- Chunked download for large files
+- Content-type verification
 - Keyword filters for PDF names
+- Automatic duplicate prevention
 
 ### `scrape.py`
 Main script with interactive user interface.

@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from crawler import WebCrawler
 from config import DOWNLOAD_FOLDER, MAX_FILE_SIZE, USER_AGENT, DELAY_BETWEEN_REQUESTS
 import time
-
+import re
 
 class PDFFinder:
 
@@ -56,6 +56,26 @@ class PDFFinder:
         return False
 
 
+    # Sanitize the domain name to create a valid filename
+    def _sanitize_domain_name(self, domain):
+        
+        # Remove protocol if present
+        domain = domain.replace('http://', '').replace('https://', '')
+        # Remove www. prefix if present
+        domain = domain.replace('www.', '')
+        # Remove port if present
+        domain = domain.split(':')[0]
+        # Replace invalid filename characters with underscores
+        domain = re.sub(r'[<>:"/\\|?*]', '_', domain)
+        # Replace dots with underscores except for the last one
+        parts = domain.split('.')
+        if len(parts) > 1:
+            domain = '_'.join(parts[:-1]) + '.' + parts[-1]
+        return domain
+
+
+
+
     # Download the PDF file
     def download_pdf(self, url, filename=None):
 
@@ -65,11 +85,22 @@ class PDFFinder:
             # If no filename is provided, use the last part of the URL
             if filename is None:
                 parsed_url = urlparse(url)
-                filename = os.path.basename(parsed_url.path)
-                if not filename or not filename.endswith('.pdf'):
-                    filename = f"document_{hash(url) % 10000}.pdf"  # Generate a unique filename if the URL doesn't provide one
+                domain = self._sanitize_domain_name(parsed_url.netloc)
+                
+                # Try to get original filename
+                original_filename = os.path.basename(parsed_url.path)
+                if original_filename and original_filename.endswith('.pdf'):
+                    # Remove .pdf extension temporarily
+                    base_name = original_filename[:-4]
+                    # Clean the base name
+                    base_name = re.sub(r'[<>:"/\\|?*]', '_', base_name)
+                    filename = f"{domain}_{base_name}.pdf"
+                else:
+                    # Generate unique filename with domain
+                    unique_id = hash(url) % 10000
+                    # Complete the filename with the download folder
+                    filename = f"{domain}_{unique_id}.pdf"
 
-            # Complete the filename with the download folder
             filepath = os.path.join(DOWNLOAD_FOLDER, filename)
 
             # Check if the file already exists
@@ -78,20 +109,57 @@ class PDFFinder:
                 return filepath
 
             # Download the PDF file
-            response = self.session.get(url, timeout=10)
+            response = self.session.get(url, 
+                                  timeout=30,           # Timeout più lungo
+                                  allow_redirects=True, # Gestisce redirect
+                                  stream=True)          # Per file grandi
+            
             response.raise_for_status()  # Raise an error for bad responses
+
+            # Check content type to verify it's actually a PDF
+            content_type = response.headers.get('Content-Type', '').lower()
+            if 'pdf' not in content_type and not url.lower().endswith('.pdf'):
+                print(f"Warning: Content type is '{content_type}', may not be a PDF")
+
+            # Check file size before downloading
+            content_length = response.headers.get('Content-Length')
+            if content_length and int(content_length) > MAX_FILE_SIZE:
+                print(f"File too large ({content_length} bytes > {MAX_FILE_SIZE} bytes). Skipping.")
+                return None
+
+
 
             # Save the PDF file
             with open(filepath, 'wb') as file:
-                file.write(response.content)
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:  # Filter out keep-alive chunks
+                        file.write(chunk)
 
             print(f"Downloaded {filename} to {DOWNLOAD_FOLDER}")
             time.sleep(DELAY_BETWEEN_REQUESTS)  # Delay between requests to avoid overloading the server
             return filepath
-        except Exception as e:
-            print(f"Error downloading {url}: {e}")
+        
+        except requests.exceptions.ConnectionError as e:
+            if "Failed to resolve" in str(e) or "getaddrinfo failed" in str(e):
+                print(f"DNS resolution error for {url}. Check internet connection or try again later.")
+            else:
+                print(f"Connection error downloading {url}: {e}")
             return None
-
+        except requests.exceptions.Timeout:
+            print(f"Timeout error downloading {url}. Server may be slow or unresponsive.")
+            return None
+        except requests.exceptions.HTTPError as e:
+            print(f"HTTP error downloading {url}: Status code {e.response.status_code}")
+            return None
+        except requests.exceptions.RequestException as e:
+            print(f"Network error downloading {url}: {e}")
+            return None
+        except OSError as e:
+            print(f"File system error saving {filename}: {e}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error downloading {url}: {e}")
+            return None
 
 
 
