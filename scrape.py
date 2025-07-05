@@ -2,17 +2,26 @@ from config import MAX_DEPTH
 from pdf_finder import PDFFinder
 import sys
 import os
+from logger import setup_logger
+import logging
 
 def main():
-        
+
     os.system('cls')
     print("=== PDF Web Scraper ===")
+
+
+    # Setup logger
+    log_file = setup_logger()
+    logger = logging.getLogger('scraper')
+
+        
 
     #Aske the user for the base URL
     base_url = input("Enter the base URL to scrape for PDFs: ").strip()
 
     if not base_url:
-        print("Base not valid. Exiting.")
+        logger.error("Base not valid. Exiting.")
         return
     
     # Add keywords if needed
@@ -48,20 +57,27 @@ def main():
         downloaded_files = finder.run()
 
         print(f"\nFound and downloaded {len(downloaded_files)} PDF files:")
+        logger.info(f"\nFound and downloaded {len(downloaded_files)} PDF files:")
         
+
         if downloaded_files:
             print(f"Files saved in: downloaded_pdfs")
             print(f"Downloaded files:")
+            logger.info(f"Downloaded files:")
             for file in downloaded_files:
                 print(f"- {file}")
+                logger.info(f"- {file}")
         else:
             print("No PDF files found.")
+            logger.info("No PDF files found.")
 
 
     except KeyboardInterrupt:
         print("\nProcess interrupted by user.")
+        logger.info("Process interrupted by user.")
     except Exception as e:
         print(f"An error occurred: {e}")
+        logger.error(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     main()

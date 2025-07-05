@@ -9,3 +9,6 @@ certifi>=2023.7.22
 
 # Optional: for better SSL support
 requests[security]>=2.31.0
+
+# Progress bar for long-running tasks
+tqdm => 4.66.0
